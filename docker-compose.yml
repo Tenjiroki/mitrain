@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    container_name: mitrain-php
+    working_dir: /var/www/html
+    volumes:
+      - ./app:/var/www/html
+    ports:
+      - "8000:8000"
+    command: symfony serve --no-interaction --port=8000 --allow-http --allow-all-ip
+    depends_on:
+      - db
+      - mailer
+    environment:
+      - DATABASE_URL=mysql://mitrain:mitrain@db:3306/mitrain?serverVersion=8.0&charset=utf8mb4
+      - MAILER_DSN=smtp://mailer:1025
+    networks:
+      - symfony-network
+
+  db:
+    image: mysql:8.0
+    container_name: mitrain-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mitrain
+      MYSQL_USER: mitrain
+      MYSQL_PASSWORD: mitrain
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - symfony-network
+
+  adminer:
+    image: adminer
+    container_name: mitrain-adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    networks:
+      - symfony-network
+
+  mailer:
+    image: axllent/mailpit
+    container_name: mitrain-mailer
+    ports:
+      - "1080:8025"
+      - "1025:1025"
+    networks:
+      - symfony-network
+
+volumes:
+  db_data:
+
+networks:
+  symfony-network:
