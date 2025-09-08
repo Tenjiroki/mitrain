@@ -14,7 +14,7 @@ class BaseController extends AbstractController
     {
         
         return $this->render(
-            'index.html.twig'
+            'base.html.twig'
         );
     }
 
