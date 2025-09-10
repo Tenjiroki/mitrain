@@ -1,0 +1,320 @@
+{# templates/workout/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}My Workouts{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>My Workouts</h1>
+        <a href="{{ path('workout_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> New Workout
+        </a>
+    </div>
+
+    {% if workouts is empty %}
+        <div class="alert alert-info">
+            <h4>No workouts yet!</h4>
+            <p>Start tracking your fitness journey by <a href="{{ path('workout_new') }}">creating your first workout</a>.</p>
+        </div>
+    {% else %}
+        <div class="row">
+            {% for workout in workouts %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ workout.name ?: 'Workout #' ~ workout.id }}</h5>
+                            <p class="card-text">
+                                <small class="text-muted">{{ workout.date|date('M j, Y') }}</small>
+                            </p>
+                            <p class="card-text">
+                                <strong>{{ workout.workoutExercises|length }}</strong> exercise{{ workout.workoutExercises|length != 1 ? 's' : '' }}
+                            </p>
+                            {% if workout.notes %}
+                                <p class="card-text">{{ workout.notes|truncate(100) }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ path('workout_show', {'id': workout.id}) }}" class="btn btn-outline-primary btn-sm">View</a>
+                            <a href="{{ path('workout_edit', {'id': workout.id}) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{# templates/workout/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}New Workout{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .exercise-form-wrapper {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+        }
+        .sets-container {
+            background-color: white;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+        }
+        .set-form-wrapper {
+            display: flex;
+            align-items-center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 0.25rem;
+        }
+        .set-inputs {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        .set-inputs input {
+            flex: 1;
+            min-width: 80px;
+        }
+        .btn-remove {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+        .btn-add {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>New Workout</h1>
+        <a href="{{ path('workout_index') }}" class="btn btn-outline-secondary">Back to Workouts</a>
+    </div>
+
+    {{ form_start(form, {'attr': {'id': 'workout-form'}}) }}
+        <div class="row mb-4">
+            <div class="col-md-6">
+                {{ form_row(form.name) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.date) }}
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            {{ form_row(form.notes) }}
+        </div>
+
+        <div class="exercises-section">
+            <h3>Exercises</h3>
+            <div id="workout-exercises" 
+                 data-prototype="{{ form_widget(form.workoutExercises.vars.prototype)|e('html_attr') }}"
+                 data-index="{{ form.workoutExercises|length > 0 ? form.workoutExercises|length : 0 }}">
+                {% for workoutExercise in form.workoutExercises %}
+                    {{ include('workout/_exercise_form.html.twig', {'exerciseForm': workoutExercise}) }}
+                {% endfor %}
+            </div>
+            <button type="button" id="add-exercise" class="btn btn-add mb-3">
+                <i class="bi bi-plus-lg"></i> Add Exercise
+            </button>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save Workout</button>
+            <a href="{{ path('workout_index') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const exercisesContainer = document.getElementById('workout-exercises');
+    const addExerciseBtn = document.getElementById('add-exercise');
+    let exerciseIndex = parseInt(exercisesContainer.dataset.index);
+
+    // Add exercise functionality
+    addExerciseBtn.addEventListener('click', function() {
+        const prototype = exercisesContainer.dataset.prototype;
+        const newForm = prototype.replace(/__name__/g, exerciseIndex);
+        
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = newForm;
+        exercisesContainer.appendChild(wrapper.firstElementChild);
+        
+        exerciseIndex++;
+        exercisesContainer.dataset.index = exerciseIndex;
+    });
+
+    // Handle exercise removal
+    exercisesContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-exercise')) {
+            e.preventDefault();
+            e.target.closest('.exercise-form-wrapper').remove();
+        }
+    });
+
+    // Handle set addition
+    exercisesContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-set')) {
+            e.preventDefault();
+            const setsContainer = e.target.previousElementSibling.querySelector('.sets-container');
+            const prototype = setsContainer.dataset.prototype;
+            const setIndex = setsContainer.querySelectorAll('.set-form-wrapper').length;
+            const newSet = prototype.replace(/__name__/g, setIndex);
+            
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = newSet;
+            setsContainer.appendChild(wrapper.firstElementChild);
+        }
+    });
+
+    // Handle set removal
+    exercisesContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-set')) {
+            e.preventDefault();
+            e.target.closest('.set-form-wrapper').remove();
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{# templates/workout/_exercise_form.html.twig #}
+<div class="exercise-form-wrapper">
+    {{ form_widget(exerciseForm.orderInWorkout) }}
+    
+    <div class="row mb-3">
+        <div class="col-md-8">
+            {{ form_row(exerciseForm.exercise) }}
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="button" class="btn btn-remove remove-exercise">Remove Exercise</button>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        {{ form_row(exerciseForm.notes) }}
+    </div>
+
+    <div class="sets-section">
+        <h5>Sets</h5>
+        <div class="sets-container" 
+             data-prototype="{{ form_widget(exerciseForm.sets.vars.prototype)|e('html_attr') }}">
+            {% for set in exerciseForm.sets %}
+                {{ include('workout/_set_form.html.twig', {'setForm': set}) }}
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-add add-set">Add Set</button>
+    </div>
+</div>
+
+{# templates/workout/_set_form.html.twig #}
+<div class="set-form-wrapper">
+    {{ form_widget(setForm.setNumber) }}
+    <div class="set-inputs">
+        {{ form_widget(setForm.reps) }}
+        {{ form_widget(setForm.weight) }}
+        {{ form_widget(setForm.duration) }}
+        {{ form_widget(setForm.distance) }}
+        {{ form_widget(setForm.notes) }}
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        {{ form_widget(setForm.completed) }}
+        <button type="button" class="btn btn-remove remove-set">✕</button>
+    </div>
+</div>
+
+{# templates/workout/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ workout.name ?: 'Workout #' ~ workout.id }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>{{ workout.name ?: 'Workout #' ~ workout.id }}</h1>
+            <p class="text-muted">{{ workout.date|date('F j, Y') }}</p>
+        </div>
+        <div>
+            <a href="{{ path('workout_edit', {'id': workout.id}) }}" class="btn btn-primary">Edit</a>
+            <a href="{{ path('workout_index') }}" class="btn btn-outline-secondary">Back</a>
+        </div>
+    </div>
+
+    {% if workout.notes %}
+        <div class="alert alert-info">
+            <strong>Notes:</strong> {{ workout.notes }}
+        </div>
+    {% endif %}
+
+    {% if workout.workoutExercises is empty %}
+        <div class="alert alert-warning">
+            No exercises in this workout.
+        </div>
+    {% else %}
+        {% for workoutExercise in workout.workoutExercises %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>{{ workoutExercise.exercise.name }}</h5>
+                    {% if workoutExercise.notes %}
+                        <small class="text-muted">{{ workoutExercise.notes }}</small>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if workoutExercise.sets is empty %}
+                        <p class="text-muted">No sets recorded</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Set</th>
+                                        <th>Reps</th>
+                                        <th>Weight</th>
+                                        <th>Duration</th>
+                                        <th>Distance</th>
+                                        <th>Notes</th>
+                                        <th>✓</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for set in workoutExercise.sets %}
+                                        <tr class="{{ set.completed ? 'table-success' : '' }}">
+                                            <td>{{ set.setNumber }}</td>
+                                            <td>{{ set.reps ?: '-' }}</td>
+                                            <td>{{ set.weight ? set.weight ~ ' kg' : '-' }}</td>
+                                            <td>{{ set.duration ? set.duration ~ 's' : '-' }}</td>
+                                            <td>{{ set.distance ? set.distance ~ ' km' : '-' }}</td>
+                                            <td>{{ set.notes ?: '-' }}</td>
+                                            <td>{{ set.completed ? '✓' : '✗' }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

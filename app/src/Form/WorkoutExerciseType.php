@@ -3,10 +3,12 @@
 namespace App\Form;
 
 use App\Entity\Exercise;
-use App\Entity\Workout;
 use App\Entity\WorkoutExercise;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,15 +17,26 @@ class WorkoutExerciseType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('orderInWorkout')
-            ->add('notes')
-            ->add('workout', EntityType::class, [
-                'class' => Workout::class,
-                'choice_label' => 'id',
-            ])
             ->add('exercise', EntityType::class, [
                 'class' => Exercise::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
+                'placeholder' => 'Choose an exercise',
+                'label' => 'Exercise'
+            ])
+            ->add('orderInWorkout', HiddenType::class)
+            ->add('notes', TextareaType::class, [
+                'required' => false,
+                'label' => 'Exercise Notes',
+                'attr' => ['rows' => 2, 'placeholder' => 'Notes']
+            ])
+            ->add('sets', CollectionType::class, [
+                'entry_type' => ExerciseSetType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'prototype' => true,
+                'label' => false,
+                'attr' => ['class' => 'exercise-sets-collection']
             ])
         ;
     }
