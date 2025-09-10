@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class WorkoutController extends AbstractController
 {
-    #[Route('/workout/', name: 'workout_index', methods: ['GET'])]
+    #[Route('/', name: 'workout_index', methods: ['GET'])]
     public function index(WorkoutRepository $workoutRepository): Response
     {
         $workouts = $workoutRepository->findBy(

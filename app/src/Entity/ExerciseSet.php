@@ -48,19 +48,18 @@ class ExerciseSet
     public function setWorkoutExercise(?WorkoutExercise $workoutExercise): static
     {
         $this->workoutExercise = $workoutExercise;
-
         return $this;
     }
 
-    public function getSetsNumber(): ?int
+    // Fixed method names to match property name
+    public function getSetNumber(): ?int
     {
         return $this->setNumber;
     }
 
-    public function setSetsNumber(int $setsNumber): static
+    public function setSetNumber(int $setNumber): static
     {
-        $this->setNumber = $setsNumber;
-
+        $this->setNumber = $setNumber;
         return $this;
     }
 
@@ -69,10 +68,9 @@ class ExerciseSet
         return $this->reps;
     }
 
-    public function setReps(int $reps): static
+    public function setReps(?int $reps): static
     {
         $this->reps = $reps;
-
         return $this;
     }
 
@@ -84,7 +82,6 @@ class ExerciseSet
     public function setWeight(?float $weight): static
     {
         $this->weight = $weight;
-
         return $this;
     }
 
@@ -96,7 +93,6 @@ class ExerciseSet
     public function setDuration(?int $duration): static
     {
         $this->duration = $duration;
-
         return $this;
     }
 
@@ -108,7 +104,6 @@ class ExerciseSet
     public function setDistance(?float $distance): static
     {
         $this->distance = $distance;
-
         return $this;
     }
 
@@ -117,10 +112,9 @@ class ExerciseSet
         return $this->completed;
     }
 
-    public function setCompleted(bool $completed): static
+    public function setCompleted(?bool $completed): static
     {
         $this->completed = $completed;
-
         return $this;
     }
 }

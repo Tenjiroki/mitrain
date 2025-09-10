@@ -34,6 +34,12 @@ class Workout
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTime $updatedAt = null;
 
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTime();
+    }
+
     /**
      * @var Collection<int, WorkoutExercise>
      */
@@ -134,5 +140,27 @@ class Workout
     public function __toString(): string
     {
         return $this->name ?? 'Workout #' . $this->id;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTime $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
     }
 }

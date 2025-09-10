@@ -1,0 +1,28 @@
+{# templates/workout/_exercise_form.html.twig #}
+<div class="exercise-form-wrapper">
+    {{ form_widget(exerciseForm.orderInWorkout) }}
+    
+    <div class="row mb-3">
+        <div class="col-md-8">
+            {{ form_row(exerciseForm.exercise) }}
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="button" class="btn btn-remove remove-exercise">Remove Exercise</button>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        {{ form_row(exerciseForm.notes) }}
+    </div>
+
+    <div class="sets-section">
+        <h5>Sets</h5>
+        <div class="sets-container" 
+             data-prototype="{{ form_widget(exerciseForm.sets.vars.prototype)|e('html_attr') }}">
+            {% for set in exerciseForm.sets %}
+                {{ include('workout/_set_form.html.twig', {'setForm': set}) }}
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-add add-set">Add Set</button>
+    </div>
+</div>

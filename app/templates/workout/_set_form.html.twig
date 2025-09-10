@@ -1,0 +1,14 @@
+{# templates/workout/_set_form.html.twig #}
+<div class="set-form-wrapper">
+    {{ form_widget(setForm.setNumber) }}
+    <div class="set-inputs">
+        {{ form_widget(setForm.reps) }}
+        {{ form_widget(setForm.weight) }}
+        {{ form_widget(setForm.duration) }}
+        {{ form_widget(setForm.distance) }}
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        {{ form_widget(setForm.completed) }}
+        <button type="button" class="btn btn-remove remove-set">✕</button>
+    </div>
+</div>
