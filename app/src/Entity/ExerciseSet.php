@@ -18,10 +18,10 @@ class ExerciseSet
     private ?WorkoutExercise $workoutExercise = null;
 
     #[ORM\Column]
-    private ?int $setsNumber = null;
+    private ?int $setNumber = null;
 
-    #[ORM\Column]
-    private ?int $reps = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $reps = null; 
 
     #[ORM\Column(nullable: true)]
     private ?float $weight = null;
@@ -32,8 +32,8 @@ class ExerciseSet
     #[ORM\Column(nullable: true)]
     private ?float $distance = null;
 
-    #[ORM\Column]
-    private ?bool $completed = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $completed = null; 
 
     public function getId(): ?int
     {
@@ -54,12 +54,12 @@ class ExerciseSet
 
     public function getSetsNumber(): ?int
     {
-        return $this->setsNumber;
+        return $this->setNumber;
     }
 
     public function setSetsNumber(int $setsNumber): static
     {
-        $this->setsNumber = $setsNumber;
+        $this->setNumber = $setsNumber;
 
         return $this;
     }
