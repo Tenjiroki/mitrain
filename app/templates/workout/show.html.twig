@@ -1,4 +1,4 @@
-{# templates/workout/show.html.twig #}
+{# templates/workout/show.html.twig - Fixed version #}
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ workout.name ?: 'Workout #' ~ workout.id }}{% endblock %}
@@ -48,7 +48,6 @@
                                         <th>Weight</th>
                                         <th>Duration</th>
                                         <th>Distance</th>
-                                        <th>Notes</th>
                                         <th>✓</th>
                                     </tr>
                                 </thead>
@@ -60,7 +59,6 @@
                                             <td>{{ set.weight ? set.weight ~ ' kg' : '-' }}</td>
                                             <td>{{ set.duration ? set.duration ~ 's' : '-' }}</td>
                                             <td>{{ set.distance ? set.distance ~ ' km' : '-' }}</td>
-                                            <td>{{ set.notes ?: '-' }}</td>
                                             <td>{{ set.completed ? '✓' : '✗' }}</td>
                                         </tr>
                                     {% endfor %}

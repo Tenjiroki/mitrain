@@ -1,3 +1,4 @@
+
 {# templates/workout/new.html.twig #}
 {% extends 'base.html.twig' %}
 
@@ -17,6 +18,7 @@
             background-color: white;
             border-radius: 0.375rem;
             padding: 0.5rem;
+            margin-bottom: 1rem;
         }
         .set-form-wrapper {
             display: flex;
@@ -36,6 +38,12 @@
             flex: 1;
             min-width: 80px;
         }
+        .form-check {
+            margin-bottom: 0;
+        }
+        .form-check-input {
+            margin-top: 0;
+        }
         .btn-remove {
             background-color: #dc3545;
             color: white;
@@ -50,6 +58,9 @@
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 0.25rem;
+        }
+        .sets-section {
+            margin-top: 1rem;
         }
     </style>
 {% endblock %}
@@ -102,6 +113,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const addExerciseBtn = document.getElementById('add-exercise');
     let exerciseIndex = parseInt(exercisesContainer.dataset.index);
 
+    function updateSetPrototypes(exerciseElement, exerciseIdx) {
+        const setsContainer = exerciseElement.querySelector('.sets-container');
+        if (setsContainer && setsContainer.dataset.prototype) {
+            // Update the sets prototype to use the correct exercise index
+            const originalPrototype = setsContainer.dataset.prototype;
+            const updatedPrototype = originalPrototype.replace(/workout_workoutExercises___name__/g, `workout_workoutExercises_${exerciseIdx}`);
+            setsContainer.dataset.prototype = updatedPrototype;
+        }
+    }
+
     // Add exercise functionality
     addExerciseBtn.addEventListener('click', function() {
         const prototype = exercisesContainer.dataset.prototype;
@@ -109,7 +130,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const wrapper = document.createElement('div');
         wrapper.innerHTML = newForm;
-        exercisesContainer.appendChild(wrapper.firstElementChild);
+        const newExerciseElement = wrapper.firstElementChild;
+        
+        // Update the sets prototype for this new exercise
+        updateSetPrototypes(newExerciseElement, exerciseIndex);
+        
+        exercisesContainer.appendChild(newExerciseElement);
         
         exerciseIndex++;
         exercisesContainer.dataset.index = exerciseIndex;
@@ -127,14 +153,22 @@ document.addEventListener('DOMContentLoaded', function() {
     exercisesContainer.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-set')) {
             e.preventDefault();
-            const setsContainer = e.target.previousElementSibling.querySelector('.sets-container');
-            const prototype = setsContainer.dataset.prototype;
-            const setIndex = setsContainer.querySelectorAll('.set-form-wrapper').length;
-            const newSet = prototype.replace(/__name__/g, setIndex);
             
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = newSet;
-            setsContainer.appendChild(wrapper.firstElementChild);
+            // Find the sets container for this exercise
+            const exerciseWrapper = e.target.closest('.exercise-form-wrapper');
+            const setsContainer = exerciseWrapper.querySelector('.sets-container');
+            
+            if (setsContainer && setsContainer.dataset.prototype) {
+                const prototype = setsContainer.dataset.prototype;
+                const setIndex = setsContainer.querySelectorAll('.set-form-wrapper').length;
+                
+                // Replace the set index placeholder
+                const newSet = prototype.replace(/__name__/g, setIndex);
+                
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = newSet;
+                setsContainer.appendChild(wrapper.firstElementChild);
+            }
         }
     });
 
@@ -144,6 +178,11 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             e.target.closest('.set-form-wrapper').remove();
         }
+    });
+
+    // Initialize existing exercises
+    exercisesContainer.querySelectorAll('.exercise-form-wrapper').forEach((exerciseElement, index) => {
+        updateSetPrototypes(exerciseElement, index);
     });
 });
 </script>

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Form;
 
 use App\Entity\Workout;
@@ -18,16 +17,24 @@ class WorkoutType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Workout Name',
-                'attr' => ['placeholder' => 'Enter workout name']
+                'attr' => [
+                    'placeholder' => 'Enter workout name',
+                    'class' => 'form-control'
+                ]
             ])
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Workout Date'
+                'label' => 'Workout Date',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('notes', TextareaType::class, [
                 'required' => false,
                 'label' => 'Notes',
-                'attr' => ['rows' => 3, 'placeholder' => 'Notes here']
+                'attr' => [
+                    'rows' => 3, 
+                    'placeholder' => 'Notes here',
+                    'class' => 'form-control'
+                ]
             ])
             ->add('workoutExercises', CollectionType::class, [
                 'entry_type' => WorkoutExerciseType::class,

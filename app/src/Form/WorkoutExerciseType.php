@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Form;
 
 use App\Entity\Exercise;
@@ -21,13 +20,18 @@ class WorkoutExerciseType extends AbstractType
                 'class' => Exercise::class,
                 'choice_label' => 'name',
                 'placeholder' => 'Choose an exercise',
-                'label' => 'Exercise'
+                'label' => 'Exercise',
+                'attr' => ['class' => 'form-select']
             ])
             ->add('orderInWorkout', HiddenType::class)
             ->add('notes', TextareaType::class, [
                 'required' => false,
                 'label' => 'Exercise Notes',
-                'attr' => ['rows' => 2, 'placeholder' => 'Notes']
+                'attr' => [
+                    'rows' => 2, 
+                    'placeholder' => 'Notes',
+                    'class' => 'form-control'
+                ]
             ])
             ->add('sets', CollectionType::class, [
                 'entry_type' => ExerciseSetType::class,
